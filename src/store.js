@@ -1,0 +1,13 @@
+const KEY='class-advent-v1';
+export const uid=()=>Math.random().toString(36).slice(2,9);
+export const ymd=(d=new Date())=>{const z=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`};
+const base=()=>({init:true,className:'5학년 1반',title:'우리 반 크리스마스 어드벤트',target:`${new Date().getFullYear()}-12-24`,holidays:[],skipWeekend:true,bg:'',students:[],gifts:[],history:[]});
+export const demo=()=>({...base(),students:Array.from({length:27},(_,i)=>({id:uid(),name:`학생${i+1}`})),gifts:[['🍫','초콜릿 세트','달콤한 간식'],['✏️','특별 연필','반짝이는 연필'],['🎟️','숙제 면제권','딱 하루만!'],['🪑','자리 선택권','원하는 자리에 앉기'],['🎮','보드게임 우선권','점심시간 선택'],['🧸','작은 인형','포근한 선물']].map(([emoji,name,desc])=>({id:uid(),emoji,name,desc}))});
+export const empty=()=>({...base(),className:'우리 반'});
+export const load=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{init:false}}catch{return{init:false}}};
+export const save=s=>{try{localStorage.setItem(KEY,JSON.stringify(s))}catch{alert('저장 공간이 부족합니다. 배경 이미지를 작은 파일로 바꿔 주세요.')}};
+export const clearAll=()=>localStorage.removeItem(KEY);
+export const isSchoolDay=(s,d=new Date())=>!((s.skipWeekend&&[0,6].includes(d.getDay()))||s.holidays.includes(ymd(d)));
+export const daysLeft=s=>{let n=0;const d=new Date();d.setHours(0,0,0,0);const e=new Date(s.target+'T00:00:00');for(;d<=e;d.setDate(d.getDate()+1))if(isSchoolDay(s,d))n++;return n};
+export const active=s=>s.history.filter(h=>!h.cancelled);
+export const remaining=s=>{const done=new Set(active(s).map(h=>h.studentId));return s.students.filter(x=>!done.has(x.id))};
